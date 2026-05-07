@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <!-- 这里声明文档类型为 HTML5，浏览器会用标准模式解析页面。 -->
 <html lang="zh-CN">
-<!-- 这里设置页面语言为中文，因为页面说明和代码注释面向中文新手。 -->
+<!-- 这里设置页面语言为中文，因为这个练习面向中文编程新手。 -->
 <head>
     <!-- 这里设置字符编码为 UTF-8，避免中文注释和页面文字乱码。 -->
     <meta charset="UTF-8">
 
-    <!-- 这里让网页在电脑和手机上都能自适应显示。 -->
+    <!-- 这里让网页在手机、平板和电脑上都能自适应显示。 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- 这里设置浏览器标签页标题。 -->
     <title>Amazon Listing Generator</title>
 
-    <!-- 这里开始写 CSS；为了满足“单文件”要求，样式都放在 index.html 里。 -->
+    <!-- 这里开始写 CSS；为了满足“单文件”要求，样式全部放在 index.html 里。 -->
     <style>
-        /* 这里设置全局盒模型，方便新手理解宽度计算，padding 不会把元素撑爆。 */
+        /* 这里设置全局盒模型，padding 和 border 不会把元素宽度撑大，适合新手布局。 */
         * {
             box-sizing: border-box;
         }
@@ -27,10 +27,10 @@
             color: #1f2937;
         }
 
-        /* 这里让页面内容居中，并限制最大宽度，让界面保持简洁。 */
+        /* 这里让页面内容居中，并限制最大宽度，保持页面简洁。 */
         .page {
-            width: min(92%, 900px);
-            margin: 40px auto;
+            width: min(94%, 980px);
+            margin: 36px auto;
         }
 
         /* 这里设置顶部介绍区域，让用户快速知道工具用途。 */
@@ -42,14 +42,14 @@
         /* 这里设置主标题样式。 */
         .hero h1 {
             margin: 0 0 10px;
-            font-size: clamp(28px, 5vw, 42px);
+            font-size: clamp(28px, 5vw, 44px);
             color: #111827;
         }
 
         /* 这里设置说明文字样式。 */
         .hero p {
             margin: 0 auto;
-            max-width: 680px;
+            max-width: 760px;
             color: #6b7280;
             line-height: 1.7;
         }
@@ -57,9 +57,16 @@
         /* 这里设置白色卡片，用来包住输入区和结果区。 */
         .card {
             background: #ffffff;
-            border-radius: 18px;
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08);
             padding: 26px;
+        }
+
+        /* 这里使用网格布局，让截图上传区和文字输入区在大屏幕上左右排列。 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         /* 这里设置每个表单项的底部间距。 */
@@ -71,12 +78,13 @@
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 700;
+            font-weight: 800;
         }
 
-        /* 这里统一设置输入框和多行文本框样式。 */
+        /* 这里统一设置输入框、多行文本框和文件选择框的样式。 */
         input,
-        textarea {
+        textarea,
+        select {
             width: 100%;
             border: 1px solid #d1d5db;
             border-radius: 12px;
@@ -87,15 +95,22 @@
             background: #ffffff;
         }
 
-        /* 这里设置多行文本框高度，方便输入多个卖点。 */
+        /* 这里设置文件选择框，让上传截图入口更明显。 */
+        input[type="file"] {
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        /* 这里设置多行文本框高度，方便输入补充卖点。 */
         textarea {
             min-height: 130px;
             resize: vertical;
         }
 
-        /* 这里设置输入框聚焦状态，用户点击时有清晰反馈。 */
+        /* 这里设置输入框聚焦状态，用户点击时会有清晰反馈。 */
         input:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: #ff9900;
             box-shadow: 0 0 0 4px rgba(255, 153, 0, 0.18);
@@ -106,6 +121,47 @@
             margin: 8px 0 0;
             color: #6b7280;
             font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 这里设置安全提示，提醒用户前端 API Key 只适合学习演示。 */
+        .notice {
+            margin: 0 0 18px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* 这里设置截图预览容器。 */
+        .preview-box {
+            display: grid;
+            place-items: center;
+            min-height: 260px;
+            border: 2px dashed #d1d5db;
+            border-radius: 16px;
+            background: #f9fafb;
+            overflow: hidden;
+        }
+
+        /* 这里设置未上传截图时的占位文字。 */
+        .preview-placeholder {
+            padding: 20px;
+            color: #9ca3af;
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        /* 这里设置上传后的图片预览，避免图片超出卡片。 */
+        .preview-box img {
+            display: none;
+            width: 100%;
+            max-height: 420px;
+            object-fit: contain;
+            background: #ffffff;
         }
 
         /* 这里设置生成按钮样式，使用接近 Amazon 的橙色。 */
@@ -117,29 +173,52 @@
             background: #ff9900;
             color: #111827;
             font-size: 17px;
-            font-weight: 800;
+            font-weight: 900;
             cursor: pointer;
-            transition: transform 0.15s ease, background 0.15s ease;
+            transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
         }
 
         /* 这里设置按钮悬停效果。 */
-        button:hover {
+        button:hover:not(:disabled) {
             background: #f59e0b;
             transform: translateY(-1px);
         }
 
-        /* 这里设置输入错误提示，默认隐藏。 */
-        .tip {
+        /* 这里设置按钮禁用时的样式，避免用户重复点击。 */
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+        /* 这里设置状态提示，默认隐藏，后面由 JavaScript 控制显示。 */
+        .message {
             display: none;
             margin: 12px 0 0;
-            color: #dc2626;
+            padding: 11px 12px;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        /* 这里设置错误提示颜色。 */
+        .message.error {
+            display: block;
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        /* 这里设置成功或处理中提示颜色。 */
+        .message.info {
+            display: block;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
         }
 
         /* 这里设置结果区域和输入区域之间的分隔。 */
         .result {
-            margin-top: 26px;
+            margin-top: 28px;
             padding-top: 24px;
             border-top: 1px solid #e5e7eb;
         }
@@ -170,6 +249,7 @@
             line-height: 1.7;
             background: #f9fafb;
             border: 1px solid #e5e7eb;
+            white-space: pre-wrap;
         }
 
         /* 这里给 Amazon 标题添加橙色强调边框。 */
@@ -189,6 +269,17 @@
             margin-bottom: 10px;
             line-height: 1.7;
         }
+
+        /* 这里做响应式处理：屏幕较窄时，左右两列改成上下排列。 */
+        @media (max-width: 760px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -200,37 +291,86 @@
             <h1>Amazon Listing Generator</h1>
 
             <!-- 这里用简单中文告诉新手怎么用。 -->
-            <p>输入商品名称和卖点，点击按钮后自动生成英文 Amazon 标题、5 条英文 Bullet Points 和一段英文 Product Description。</p>
+            <p>上传商品截图，AI 会读取图片中的商品信息，并生成英文 Amazon 标题、5 条英文 Bullet Points 和一段英文 Product Description。</p>
         </section>
 
-        <!-- 这里是主要卡片区域，包含输入和输出。 -->
+        <!-- 这里是主要卡片区域，包含上传、输入和输出。 -->
         <section class="card">
-            <!-- 这里是商品名称输入区。 -->
-            <div class="form-group">
-                <!-- 这里的 for 对应 input 的 id，点击文字也能聚焦输入框。 -->
-                <label for="productName">商品名称</label>
+            <!-- 这里提醒新手：单文件前端可以学习使用，但不要把真实 API Key 放到公开网页里。 -->
+            <p class="notice">学习提示：因为浏览器本身不能真正“看懂图片”，这里使用 OpenAI 视觉模型分析截图。API Key 只保存在当前页面内存中，不会写入文件；但前端直连 API 只适合本地学习演示，正式上线应改成后端转发。</p>
 
-                <!-- 这里让用户输入商品名称。 -->
-                <input id="productName" type="text" placeholder="例如：Wireless Bluetooth Earbuds">
+            <!-- 这里用两列布局组织上传区和补充输入区。 -->
+            <div class="form-grid">
+                <!-- 这里是商品截图上传区域。 -->
+                <div>
+                    <div class="form-group">
+                        <!-- 这里是截图上传框的标签。 -->
+                        <label for="productImage">商品截图（必填）</label>
+
+                        <!-- 这里让用户上传商品截图，accept 限制为常见图片格式。 -->
+                        <input id="productImage" type="file" accept="image/png, image/jpeg, image/webp, image/gif">
+
+                        <!-- 这里给新手提示截图质量要求。 -->
+                        <p class="hint">建议上传清晰的商品图、包装图、详情页截图或竞品 Listing 截图。</p>
+                    </div>
+
+                    <!-- 这里展示上传后的图片预览。 -->
+                    <div class="preview-box">
+                        <!-- 这里是未上传图片时显示的占位提示。 -->
+                        <p id="previewPlaceholder" class="preview-placeholder">图片预览会显示在这里。<br>先选择一张商品截图。</p>
+
+                        <!-- 这里是图片预览元素，选择文件后由 JavaScript 设置 src。 -->
+                        <img id="imagePreview" alt="商品截图预览">
+                    </div>
+                </div>
+
+                <!-- 这里是可选的补充信息区域，可以帮助 AI 生成更准确的文案。 -->
+                <div>
+                    <div class="form-group">
+                        <!-- 这里让用户输入 API Key，用于调用视觉模型。 -->
+                        <label for="apiKey">OpenAI API Key（本地学习用）</label>
+
+                        <!-- 这里使用 password 类型，避免 API Key 直接明文显示在屏幕上。 -->
+                        <input id="apiKey" type="password" placeholder="sk-...">
+
+                        <!-- 这里说明为什么需要 API Key。 -->
+                        <p class="hint">只有上传截图并填写 API Key，才能让 AI 直接根据图片内容生成文案。</p>
+                    </div>
+
+                    <div class="form-group">
+                        <!-- 这里允许用户选择模型，默认使用轻量视觉模型。 -->
+                        <label for="modelName">模型名称</label>
+
+                        <!-- 这里使用普通输入框，方便以后替换成你账号可用的视觉模型。 -->
+                        <input id="modelName" type="text" value="gpt-4.1-mini">
+                    </div>
+
+                    <div class="form-group">
+                        <!-- 这里的商品名称不是必填，截图不清楚时可以辅助 AI。 -->
+                        <label for="productName">商品名称（可选，用于辅助）</label>
+
+                        <!-- 这里让用户输入商品名称，但不是必填。 -->
+                        <input id="productName" type="text" placeholder="例如：Wireless Bluetooth Earbuds">
+                    </div>
+
+                    <div class="form-group">
+                        <!-- 这里的卖点也不是必填，可以让用户补充图片里看不清的信息。 -->
+                        <label for="productFeatures">补充卖点（可选）</label>
+
+                        <!-- 这里让用户输入补充卖点，可以用逗号、顿号、分号或换行分隔。 -->
+                        <textarea id="productFeatures" placeholder="例如：noise cancelling, 40-hour battery life, comfortable fit, fast charging, waterproof"></textarea>
+
+                        <!-- 这里给新手一个输入格式提示。 -->
+                        <p class="hint">如果截图信息不完整，可以在这里补充材质、尺寸、适用人群、场景等。</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- 这里是商品卖点输入区。 -->
-            <div class="form-group">
-                <!-- 这里是卖点输入框的标签。 -->
-                <label for="productFeatures">商品卖点</label>
+            <!-- 这里是生成按钮，点击后会读取截图并请求 AI。 -->
+            <button id="generateButton" type="button">Upload Screenshot & Generate Listing</button>
 
-                <!-- 这里让用户输入多个卖点，可以用逗号、顿号、分号或换行分隔。 -->
-                <textarea id="productFeatures" placeholder="例如：noise cancelling, 40-hour battery life, comfortable fit, fast charging, waterproof"></textarea>
-
-                <!-- 这里给新手一个输入格式提示。 -->
-                <p class="hint">提示：多个卖点可以用英文逗号、中文逗号、顿号、分号或换行分隔。</p>
-            </div>
-
-            <!-- 这里是生成按钮，点击后会运行下面的 JavaScript。 -->
-            <button id="generateButton" type="button">Generate Amazon Listing</button>
-
-            <!-- 这里是输入不完整时显示的错误提示。 -->
-            <p id="tip" class="tip">请先填写商品名称，并至少输入 1 个商品卖点。</p>
+            <!-- 这里是状态提示区域，错误、处理中都会显示在这里。 -->
+            <p id="message" class="message"></p>
 
             <!-- 这里是结果展示区域。 -->
             <div class="result">
@@ -240,21 +380,21 @@
                 <!-- 这里展示英文 Amazon 标题。 -->
                 <div class="output-block">
                     <h3>English Amazon Title</h3>
-                    <p id="titleOutput" class="output-box title-output">Your Amazon title will appear here.</p>
+                    <p id="titleOutput" class="output-box title-output">Your image-based Amazon title will appear here.</p>
                 </div>
 
                 <!-- 这里展示 5 条英文 Bullet Points。 -->
                 <div class="output-block">
                     <h3>5 English Bullet Points</h3>
                     <ul id="bulletOutput">
-                        <li>Your bullet points will appear here.</li>
+                        <li>Your image-based bullet points will appear here.</li>
                     </ul>
                 </div>
 
                 <!-- 这里展示英文 Product Description。 -->
                 <div class="output-block">
                     <h3>English Product Description</h3>
-                    <p id="descriptionOutput" class="output-box">Your product description will appear here.</p>
+                    <p id="descriptionOutput" class="output-box">Your image-based product description will appear here.</p>
                 </div>
             </div>
         </section>
@@ -262,17 +402,32 @@
 
     <!-- 这里开始写 JavaScript；为了满足“单文件”要求，逻辑也放在 index.html 里。 -->
     <script>
-        // 这里获取商品名称输入框，后面要读取用户输入的商品名称。
+        // 这里获取商品截图上传框，后面要读取用户选择的图片文件。
+        const productImageInput = document.getElementById("productImage");
+
+        // 这里获取图片预览元素，选择图片后会把图片显示出来。
+        const imagePreview = document.getElementById("imagePreview");
+
+        // 这里获取图片占位提示，上传图片后会隐藏它。
+        const previewPlaceholder = document.getElementById("previewPlaceholder");
+
+        // 这里获取 API Key 输入框，用于调用 OpenAI 视觉模型。
+        const apiKeyInput = document.getElementById("apiKey");
+
+        // 这里获取模型名称输入框，方便新手以后更换模型。
+        const modelNameInput = document.getElementById("modelName");
+
+        // 这里获取商品名称输入框，这是可选辅助信息。
         const productNameInput = document.getElementById("productName");
 
-        // 这里获取商品卖点输入框，后面要读取用户输入的卖点。
+        // 这里获取补充卖点输入框，这是可选辅助信息。
         const productFeaturesInput = document.getElementById("productFeatures");
 
         // 这里获取生成按钮，后面要给按钮绑定点击事件。
         const generateButton = document.getElementById("generateButton");
 
-        // 这里获取提示文字，用于输入为空时提醒用户。
-        const tip = document.getElementById("tip");
+        // 这里获取状态提示区域，用于显示错误、处理中和成功信息。
+        const message = document.getElementById("message");
 
         // 这里获取标题输出区域，用来显示生成的英文标题。
         const titleOutput = document.getElementById("titleOutput");
@@ -283,7 +438,50 @@
         // 这里获取产品描述输出区域，用来显示英文 Product Description。
         const descriptionOutput = document.getElementById("descriptionOutput");
 
-        // 这里定义一个函数，把用户输入的卖点文本拆成数组。
+        // 这里保存图片的 Base64 Data URL，后面会发给视觉模型分析。
+        let uploadedImageDataUrl = "";
+
+        // 这里定义一个函数，用于显示提示信息。
+        function showMessage(text, type) {
+            // 这里把提示文字放到页面上。
+            message.textContent = text;
+
+            // 这里根据类型设置不同样式，例如 error 或 info。
+            message.className = `message ${type}`;
+        }
+
+        // 这里定义一个函数，用于隐藏提示信息。
+        function hideMessage() {
+            // 这里清空提示文字。
+            message.textContent = "";
+
+            // 这里恢复默认 class，让提示区域隐藏。
+            message.className = "message";
+        }
+
+        // 这里定义一个函数，把图片文件读取成 Base64 Data URL。
+        function readImageAsDataUrl(file) {
+            // 这里使用 Promise 包装 FileReader，让后面的 async/await 更容易读懂。
+            return new Promise(function (resolve, reject) {
+                // 这里创建浏览器内置的文件读取器。
+                const reader = new FileReader();
+
+                // 这里设置读取成功后的回调，把结果返回出去。
+                reader.onload = function () {
+                    resolve(reader.result);
+                };
+
+                // 这里设置读取失败后的回调，把错误返回出去。
+                reader.onerror = function () {
+                    reject(new Error("图片读取失败，请重新选择图片。"));
+                };
+
+                // 这里开始把图片读取为 Data URL，例如 data:image/png;base64,...。
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 这里定义一个函数，把用户输入的补充卖点拆成数组。
         function getFeatureList(text) {
             // 这里支持英文逗号、中文逗号、顿号、分号和换行，方便不同输入习惯。
             return text
@@ -298,76 +496,141 @@
                 });
         }
 
-        // 这里定义一个函数，用来安全获取某个卖点；如果用户没填够，就用默认英文卖点补齐。
-        function pickFeature(features, index, fallback) {
-            // 这里如果对应位置有用户输入，就返回用户输入；否则返回默认内容。
-            return features[index] || fallback;
+        // 这里定义一个函数，要求 AI 返回固定 JSON，方便页面稳定解析。
+        function buildPrompt(productName, featureList) {
+            // 这里把可选商品名整理成提示文字。
+            const productNameText = productName || "Not provided. Infer the product from the uploaded screenshot.";
+
+            // 这里把可选卖点整理成提示文字。
+            const featureText = featureList.length > 0 ? featureList.join(", ") : "Not provided. Infer benefits from the screenshot.";
+
+            // 这里返回完整提示词，明确要求英文、亚马逊风格、JSON 格式。
+            return `You are an expert Amazon listing copywriter. Analyze the uploaded product screenshot and generate listing copy that matches the product shown in the image.\n\nOptional product name from user: ${productNameText}\nOptional extra selling points from user: ${featureText}\n\nRequirements:\n1. Write in natural American English.\n2. Do not invent certifications, medical claims, warranty promises, exact dimensions, materials, compatibility, or performance numbers unless they are clearly visible in the image or provided by the user.\n3. Create one Amazon-style title under 180 characters.\n4. Create exactly 5 bullet points, each useful and specific to the product image.\n5. Create one product description paragraph.\n6. Return only valid JSON in this exact shape: {"title":"...","bullets":["...","...","...","...","..."],"description":"..."}`;
         }
 
-        // 这里定义一个函数，把一句话的首字母变成大写，让英文文案更自然。
-        function capitalizeFirstLetter(text) {
-            // 这里处理空文本，避免代码报错。
-            if (text.length === 0) {
-                return text;
+        // 这里定义一个函数，从 OpenAI Responses API 的返回值里提取文字。
+        function getOutputText(data) {
+            // 这里优先读取官方返回里的 output_text 字段。
+            if (data.output_text) {
+                return data.output_text;
             }
 
-            // 这里把第一个字符转成大写，再拼接剩余内容。
-            return text.charAt(0).toUpperCase() + text.slice(1);
+            // 这里兼容 output 数组结构，逐层寻找文本内容。
+            if (Array.isArray(data.output)) {
+                return data.output
+                    .flatMap(function (item) {
+                        return item.content || [];
+                    })
+                    .map(function (contentItem) {
+                        return contentItem.text || "";
+                    })
+                    .join("\n")
+                    .trim();
+            }
+
+            // 这里如果没有找到文本，就返回空字符串。
+            return "";
         }
 
-        // 这里定义主函数：读取输入，生成标题、5 条 bullet points 和产品描述。
-        function generateListing() {
-            // 这里读取商品名称，并去掉前后空格。
-            const productName = productNameInput.value.trim();
+        // 这里定义一个函数，用于清理 AI 可能包裹的 Markdown 代码块。
+        function cleanJsonText(text) {
+            // 这里去掉首尾空白。
+            const trimmedText = text.trim();
 
-            // 这里读取商品卖点原文，并去掉前后空格。
-            const featureText = productFeaturesInput.value.trim();
+            // 这里如果 AI 返回 ```json ... ```，就把外层代码块去掉。
+            return trimmedText
+                .replace(/^```json\s*/i, "")
+                .replace(/^```\s*/i, "")
+                .replace(/```$/i, "")
+                .trim();
+        }
 
-            // 这里把卖点原文转换为数组。
-            const features = getFeatureList(featureText);
+        // 这里定义一个函数，把 AI 返回的 JSON 解析成页面需要的数据。
+        function parseListingJson(text) {
+            // 这里先清理文本，避免 Markdown 代码块影响 JSON.parse。
+            const cleanedText = cleanJsonText(text);
 
-            // 这里判断必填内容是否完整；不完整就显示提示并停止执行。
-            if (productName === "" || features.length === 0) {
-                // 这里显示红色提示。
-                tip.style.display = "block";
+            // 这里把 JSON 字符串转成 JavaScript 对象。
+            const listing = JSON.parse(cleanedText);
 
-                // 这里结束函数，避免生成空文案。
-                return;
+            // 这里校验 title 是否存在。
+            if (!listing.title) {
+                throw new Error("AI 返回内容缺少 title。" );
             }
 
-            // 这里隐藏错误提示，因为用户已经填写了必要内容。
-            tip.style.display = "none";
+            // 这里校验 bullets 是否正好 5 条。
+            if (!Array.isArray(listing.bullets) || listing.bullets.length !== 5) {
+                throw new Error("AI 返回内容必须包含 exactly 5 bullet points。" );
+            }
 
-            // 这里准备 5 个卖点；如果用户少于 5 个，后面会用默认英文卖点补齐。
-            const featureOne = pickFeature(features, 0, "premium quality");
-            const featureTwo = pickFeature(features, 1, "easy to use");
-            const featureThree = pickFeature(features, 2, "comfortable daily experience");
-            const featureFour = pickFeature(features, 3, "durable design");
-            const featureFive = pickFeature(features, 4, "great gift choice");
+            // 这里校验 description 是否存在。
+            if (!listing.description) {
+                throw new Error("AI 返回内容缺少 description。" );
+            }
 
-            // 这里生成英文 Amazon 标题，尽量包含商品名、核心卖点和使用场景。
-            const title = `${productName} with ${capitalizeFirstLetter(featureOne)}, ${capitalizeFirstLetter(featureTwo)}, ${capitalizeFirstLetter(featureThree)}, Ideal for Home, Office, Travel and Everyday Use`;
+            // 这里返回校验后的 listing 对象。
+            return listing;
+        }
 
-            // 这里生成 5 条英文 bullet points，每条都围绕一个卖点展开。
-            const bullets = [
-                `Key Benefit: Designed with ${featureOne}, this ${productName} helps customers quickly understand the main value of the product.`,
-                `Easy Everyday Use: The ${featureTwo} design makes it simple and convenient for daily routines, beginners, families and busy users.`,
-                `Versatile for Multiple Scenarios: With ${featureThree}, it is suitable for home, office, travel, gifting and many everyday needs.`,
-                `Reliable Product Experience: Built around ${featureFour}, this ${productName} offers a practical balance of performance, comfort and value.`,
-                `Smart Buying Choice: Thanks to ${featureFive}, it is a thoughtful option for shoppers looking for a useful and dependable ${productName}.`
-            ];
+        // 这里定义一个函数，用 fetch 调用 OpenAI Responses API 分析图片并生成文案。
+        async function generateListingWithImage(apiKey, modelName, imageDataUrl, productName, featureList) {
+            // 这里组织发给模型的提示词。
+            const prompt = buildPrompt(productName, featureList);
 
-            // 这里生成英文 product description，用一段话介绍产品价值和适用人群。
-            const description = `Upgrade your everyday routine with this ${productName}. Featuring ${featureOne}, ${featureTwo}, ${featureThree}, ${featureFour} and ${featureFive}, it is designed to deliver a simple, reliable and enjoyable user experience. Whether customers use it at home, at work, while traveling or as a practical gift, this ${productName} helps meet daily needs with confidence and convenience.`;
+            // 这里发起网络请求，把文字提示和图片一起发送给视觉模型。
+            const response = await fetch("https://api.openai.com/v1/responses", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: modelName,
+                    input: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "input_text",
+                                    text: prompt
+                                },
+                                {
+                                    type: "input_image",
+                                    image_url: imageDataUrl,
+                                    detail: "high"
+                                }
+                            ]
+                        }
+                    ]
+                })
+            });
 
-            // 这里把生成好的标题显示到页面上。
-            titleOutput.textContent = title;
+            // 这里把接口返回解析成 JavaScript 对象。
+            const data = await response.json();
+
+            // 这里如果接口报错，就显示更友好的错误信息。
+            if (!response.ok) {
+                const errorMessage = data.error && data.error.message ? data.error.message : "OpenAI API 请求失败。";
+                throw new Error(errorMessage);
+            }
+
+            // 这里提取模型输出的文本。
+            const outputText = getOutputText(data);
+
+            // 这里把模型输出解析成 listing JSON。
+            return parseListingJson(outputText);
+        }
+
+        // 这里定义一个函数，把生成结果显示到页面上。
+        function renderListing(listing) {
+            // 这里显示英文标题。
+            titleOutput.textContent = listing.title;
 
             // 这里清空旧的 bullet points，避免重复显示。
             bulletOutput.innerHTML = "";
 
-            // 这里循环生成的 bullet points，并逐条添加到页面列表里。
-            bullets.forEach(function (bullet) {
+            // 这里循环 5 条 bullet points，并逐条添加到页面列表里。
+            listing.bullets.forEach(function (bullet) {
                 // 这里创建一个 li 元素，用来放一条 bullet point。
                 const listItem = document.createElement("li");
 
@@ -378,12 +641,102 @@
                 bulletOutput.appendChild(listItem);
             });
 
-            // 这里把生成好的产品描述显示到页面上。
-            descriptionOutput.textContent = description;
+            // 这里显示英文产品描述。
+            descriptionOutput.textContent = listing.description;
         }
 
-        // 这里给按钮绑定点击事件：用户点击按钮时，执行 generateListing 函数。
-        generateButton.addEventListener("click", generateListing);
+        // 这里监听截图选择事件，用户选图后立即预览。
+        productImageInput.addEventListener("change", async function () {
+            // 这里先隐藏旧提示。
+            hideMessage();
+
+            // 这里获取用户选择的第一张图片。
+            const file = productImageInput.files[0];
+
+            // 这里如果用户取消选择，就清空预览。
+            if (!file) {
+                uploadedImageDataUrl = "";
+                imagePreview.style.display = "none";
+                previewPlaceholder.style.display = "block";
+                imagePreview.removeAttribute("src");
+                return;
+            }
+
+            // 这里限制文件类型，只允许图片。
+            if (!file.type.startsWith("image/")) {
+                showMessage("请上传 PNG、JPG、WEBP 或 GIF 图片。", "error");
+                return;
+            }
+
+            // 这里限制图片大小，避免浏览器和 API 请求压力太大。
+            if (file.size > 20 * 1024 * 1024) {
+                showMessage("图片太大了，请上传 20MB 以内的截图。", "error");
+                return;
+            }
+
+            try {
+                // 这里把图片读取为 Base64 Data URL。
+                uploadedImageDataUrl = await readImageAsDataUrl(file);
+
+                // 这里把图片显示到预览区域。
+                imagePreview.src = uploadedImageDataUrl;
+                imagePreview.style.display = "block";
+                previewPlaceholder.style.display = "none";
+            } catch (error) {
+                // 这里如果读取失败，就显示错误信息。
+                showMessage(error.message, "error");
+            }
+        });
+
+        // 这里定义主函数：上传截图后，请 AI 生成标题、5 条 bullet points 和产品描述。
+        async function handleGenerateClick() {
+            // 这里先隐藏旧提示。
+            hideMessage();
+
+            // 这里读取 API Key、模型名、可选商品名和可选卖点。
+            const apiKey = apiKeyInput.value.trim();
+            const modelName = modelNameInput.value.trim() || "gpt-4.1-mini";
+            const productName = productNameInput.value.trim();
+            const featureList = getFeatureList(productFeaturesInput.value.trim());
+
+            // 这里检查是否已经上传截图。
+            if (!uploadedImageDataUrl) {
+                showMessage("请先上传一张商品截图，再生成文案。", "error");
+                return;
+            }
+
+            // 这里检查是否填写 API Key，因为没有 AI 接口就无法真正根据截图识别商品。
+            if (!apiKey) {
+                showMessage("请填写 OpenAI API Key。纯浏览器 JavaScript 不能自己识别商品截图，需要视觉模型来分析图片。", "error");
+                return;
+            }
+
+            // 这里进入加载状态，禁用按钮，避免重复提交。
+            generateButton.disabled = true;
+            generateButton.textContent = "Generating...";
+            showMessage("AI 正在分析截图并生成英文 Listing，请稍等。", "info");
+
+            try {
+                // 这里调用视觉模型，根据截图生成文案。
+                const listing = await generateListingWithImage(apiKey, modelName, uploadedImageDataUrl, productName, featureList);
+
+                // 这里把生成结果渲染到页面上。
+                renderListing(listing);
+
+                // 这里显示成功提示。
+                showMessage("生成完成！你可以继续换图或补充卖点再生成。", "info");
+            } catch (error) {
+                // 这里捕获网络错误、API 错误或 JSON 解析错误，并给新手友好的提示。
+                showMessage(`生成失败：${error.message} 如果你在浏览器看到 CORS 或网络限制，请改用本地后端转发 API 请求。`, "error");
+            } finally {
+                // 这里无论成功失败都恢复按钮状态。
+                generateButton.disabled = false;
+                generateButton.textContent = "Upload Screenshot & Generate Listing";
+            }
+        }
+
+        // 这里给按钮绑定点击事件：用户点击按钮时，执行 handleGenerateClick 函数。
+        generateButton.addEventListener("click", handleGenerateClick);
     </script>
 </body>
 </html>
