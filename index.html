@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<!-- 这里声明文档类型为 HTML5，方便浏览器用标准模式解析页面。 -->
+<html lang="zh-CN">
+<!-- 这里设置页面语言为中文，帮助浏览器和辅助工具更好地理解内容。 -->
+<head>
+    <!-- 这里设置字符编码为 UTF-8，保证中文内容不会乱码。 -->
+    <meta charset="UTF-8">
+
+    <!-- 这里让页面在手机、平板和电脑上都能按设备宽度显示。 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 这里设置浏览器标签页里显示的页面标题。 -->
+    <title>亚马逊文案生成器</title>
+
+    <!-- 这里开始编写页面样式，所有 CSS 都放在这个 style 标签中，保持单文件结构。 -->
+    <style>
+        /* 这里给整个页面设置基础样式，包括字体、背景色和文字颜色。 */
+        body {
+            margin: 0;
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        /* 这里设置页面主体容器，让内容居中并限制最大宽度，避免在大屏幕上过宽。 */
+        .page {
+            width: 90%;
+            max-width: 860px;
+            margin: 40px auto;
+        }
+
+        /* 这里设置顶部标题区域，让用户一眼知道页面用途。 */
+        .hero {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        /* 这里设置主标题的字号和间距。 */
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: 32px;
+        }
+
+        /* 这里设置说明文字的颜色和行高，让页面更友好。 */
+        .hero p {
+            margin: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* 这里设置白色卡片容器，用来承载输入区域和结果区域。 */
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+        }
+
+        /* 这里设置每一组表单项之间的距离。 */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        /* 这里设置输入框标题，让字段名称更清晰。 */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        /* 这里统一设置输入框和多行文本框的外观。 */
+        input,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #d6dbe1;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* 这里设置多行文本框的高度，并允许用户手动拉伸。 */
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* 这里设置输入框获得焦点时的高亮边框，提升交互感。 */
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #ff9900;
+            box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.18);
+        }
+
+        /* 这里设置生成按钮的样式，使用亚马逊常见的橙色作为强调色。 */
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 18px;
+            background: #ff9900;
+            color: #111;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 这里设置鼠标悬停按钮时的颜色变化。 */
+        button:hover {
+            background: #f28c00;
+        }
+
+        /* 这里设置结果区域和输入区域之间的距离。 */
+        .result {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #edf0f3;
+        }
+
+        /* 这里设置结果区小标题的间距。 */
+        .result h2 {
+            margin: 0 0 14px;
+            font-size: 22px;
+        }
+
+        /* 这里设置生成后的标题展示框。 */
+        .title-output {
+            background: #fff7e6;
+            border-left: 5px solid #ff9900;
+            border-radius: 8px;
+            padding: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        /* 这里设置五点描述列表的整体间距。 */
+        ul {
+            margin: 0;
+            padding-left: 22px;
+        }
+
+        /* 这里设置每一条 bullet point 的行高和底部间距。 */
+        li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        /* 这里设置提示信息样式，用于提醒用户补全输入内容。 */
+        .tip {
+            margin-top: 12px;
+            color: #c0392b;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 这里是页面最外层容器，用来控制整体宽度和居中。 -->
+    <main class="page">
+        <!-- 这里是页面顶部介绍区域。 -->
+        <section class="hero">
+            <!-- 这里是页面主标题。 -->
+            <h1>亚马逊商品文案生成器</h1>
+
+            <!-- 这里是页面说明文字，告诉用户如何使用这个工具。 -->
+            <p>输入商品名称和核心特点，点击按钮即可生成一个商品标题和 5 条五点描述。</p>
+        </section>
+
+        <!-- 这里是主要功能卡片，包含输入框、按钮和输出结果。 -->
+        <section class="card">
+            <!-- 这里是商品名称输入区域。 -->
+            <div class="form-group">
+                <!-- 这里是商品名称输入框的标签。 -->
+                <label for="productName">商品名称</label>
+
+                <!-- 这里让用户输入商品名称，例如“无线蓝牙耳机”。 -->
+                <input id="productName" type="text" placeholder="例如：无线蓝牙耳机">
+            </div>
+
+            <!-- 这里是商品特点输入区域。 -->
+            <div class="form-group">
+                <!-- 这里是商品特点输入框的标签。 -->
+                <label for="productFeatures">商品特点</label>
+
+                <!-- 这里让用户输入商品特点，可以用逗号、顿号或换行分隔。 -->
+                <textarea id="productFeatures" placeholder="例如：降噪、续航 40 小时、佩戴舒适、快速充电、防水"></textarea>
+            </div>
+
+            <!-- 这里是生成按钮，点击后会运行 JavaScript 生成文案。 -->
+            <button id="generateButton" type="button">生成标题和五点描述</button>
+
+            <!-- 这里是错误提示，默认隐藏，输入为空时显示。 -->
+            <p id="tip" class="tip">请先填写商品名称和至少一个商品特点。</p>
+
+            <!-- 这里是结果展示区域。 -->
+            <div class="result">
+                <!-- 这里是结果区域标题。 -->
+                <h2>生成结果</h2>
+
+                <!-- 这里显示生成出来的亚马逊商品标题。 -->
+                <div id="titleOutput" class="title-output">商品标题会显示在这里。</div>
+
+                <!-- 这里显示生成出来的 5 条 bullet points。 -->
+                <ul id="bulletOutput">
+                    <!-- 这里是默认提示内容，生成后会被 JavaScript 替换。 -->
+                    <li>五点描述会显示在这里。</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <!-- 这里开始编写页面逻辑，所有 JavaScript 都放在这个 script 标签中，保持单文件结构。 -->
+    <script>
+        // 这里通过 id 找到商品名称输入框，方便后面读取用户输入。
+        const productNameInput = document.getElementById("productName");
+
+        // 这里通过 id 找到商品特点输入框，方便后面读取用户输入。
+        const productFeaturesInput = document.getElementById("productFeatures");
+
+        // 这里通过 id 找到生成按钮，方便给按钮绑定点击事件。
+        const generateButton = document.getElementById("generateButton");
+
+        // 这里通过 id 找到标题输出区域，方便把生成的标题放进去。
+        const titleOutput = document.getElementById("titleOutput");
+
+        // 这里通过 id 找到五点描述输出列表，方便把生成的 bullet points 放进去。
+        const bulletOutput = document.getElementById("bulletOutput");
+
+        // 这里通过 id 找到提示文字，方便在输入不完整时显示提醒。
+        const tip = document.getElementById("tip");
+
+        // 这里定义一个函数，用来把用户输入的特点文本拆分成数组。
+        function getFeatureList(text) {
+            // 这里用逗号、中文逗号、顿号、分号和换行作为分隔符，适合新手直接输入多个特点。
+            return text
+                .split(/[,，、;；\n]/)
+                .map(function (feature) {
+                    // 这里去掉每个特点前后的空格，避免输出里出现多余空白。
+                    return feature.trim();
+                })
+                .filter(function (feature) {
+                    // 这里过滤掉空内容，只保留真正填写的特点。
+                    return feature.length > 0;
+                });
+        }
+
+        // 这里定义一个函数，用来从特点数组里安全地取值，不够 5 个时使用默认卖点。
+        function pickFeature(features, index, fallback) {
+            // 这里判断指定位置是否有用户填写的特点，如果没有就返回默认文案。
+            return features[index] || fallback;
+        }
+
+        // 这里定义生成文案的主要函数，按钮点击后会执行它。
+        function generateCopywriting() {
+            // 这里读取商品名称，并去掉前后空格。
+            const productName = productNameInput.value.trim();
+
+            // 这里读取商品特点原文，并去掉前后空格。
+            const featureText = productFeaturesInput.value.trim();
+
+            // 这里把特点原文转换成特点数组。
+            const features = getFeatureList(featureText);
+
+            // 这里判断用户是否填写完整，如果没有填写就显示提示并停止生成。
+            if (productName === "" || features.length === 0) {
+                // 这里显示红色提示文字。
+                tip.style.display = "block";
+
+                // 这里用 return 结束函数，避免继续生成空内容。
+                return;
+            }
+
+            // 这里隐藏提示文字，因为用户已经填写了必要内容。
+            tip.style.display = "none";
+
+            // 这里分别取出 5 个卖点，如果用户少填了几个，就用简单通用的默认卖点补足。
+            const featureOne = pickFeature(features, 0, "高品质材质");
+            const featureTwo = pickFeature(features, 1, "使用简单方便");
+            const featureThree = pickFeature(features, 2, "适合多种场景");
+            const featureFour = pickFeature(features, 3, "贴心细节设计");
+            const featureFive = pickFeature(features, 4, "理想礼物选择");
+
+            // 这里生成亚马逊风格标题，包含商品名称和核心卖点。
+            const title = `${productName}，${featureOne}，${featureTwo}，${featureThree}，适合日常使用和礼品赠送`;
+
+            // 这里生成 5 条五点描述，每一条都围绕一个卖点展开。
+            const bullets = [
+                `【核心卖点】这款 ${productName} 具备 ${featureOne} 的特点，帮助买家快速了解产品优势。`,
+                `【使用体验】${featureTwo}，让用户在日常使用中更加省心，也更适合新手和家庭用户。`,
+                `【适用场景】${featureThree}，无论是居家、办公、旅行还是送礼，都能满足不同需求。`,
+                `【细节设计】${featureFour}，从实际使用角度出发，提升产品的实用性和舒适度。`,
+                `【购买理由】${featureFive}，适合正在寻找高性价比 ${productName} 的买家。`
+            ];
+
+            // 这里把生成好的标题放到页面的标题输出区域。
+            titleOutput.textContent = title;
+
+            // 这里先清空旧的五点描述，避免多次点击后内容重复。
+            bulletOutput.innerHTML = "";
+
+            // 这里循环每一条 bullet point，并逐条添加到页面列表中。
+            bullets.forEach(function (bullet) {
+                // 这里创建一个新的 li 元素，用来显示一条五点描述。
+                const listItem = document.createElement("li");
+
+                // 这里把当前五点描述文字放进 li 元素。
+                listItem.textContent = bullet;
+
+                // 这里把 li 元素添加到 ul 列表中。
+                bulletOutput.appendChild(listItem);
+            });
+        }
+
+        // 这里给生成按钮绑定点击事件，用户点击按钮时就会调用 generateCopywriting 函数。
+        generateButton.addEventListener("click", generateCopywriting);
+    </script>
+</body>
+</html>
